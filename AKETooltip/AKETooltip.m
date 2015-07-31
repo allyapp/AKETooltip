@@ -52,6 +52,9 @@ static const CGFloat kBoundingOffset = 10.0f;
 
 - (void)AKE_init
 {
+
+    self.backgroundColor = UIColor.clearColor;
+    self.cornerRadius = 5;
     _expandsToTop = YES;
     _rootVC = [UIApplication sharedApplication].keyWindow.rootViewController.view;
     
@@ -70,24 +73,23 @@ static const CGFloat kBoundingOffset = 10.0f;
 
 #pragma mark - Setters
 
-- (void)setHideShadow:(BOOL)hideShadow
-{
+- (void)setHideShadow:(BOOL)hideShadow{
     _hideShadow = hideShadow;
-    
     self.drapeButton.backgroundColor = hideShadow ? [UIColor clearColor] : DRAPE_GRAY;
 }
 
-- (void)setArrowColor:(UIColor *)arrowColor
-{
+- (void)setArrowColor:(UIColor *)arrowColor{
     _arrowColor = arrowColor;
-    
     [self layoutIfNeeded];
 }
 
-- (void)setBorderColor:(UIColor *)borderColor
-{
+- (void)setBorderColor:(UIColor *)borderColor{
     _borderColor = borderColor;
-    
+    [self layoutIfNeeded];
+}
+
+- (void)setCornerRadius:(CGFloat)cornerRadius{
+    _cornerRadius = cornerRadius;
     [self layoutIfNeeded];
 }
 
@@ -139,12 +141,11 @@ static const CGFloat kBoundingOffset = 10.0f;
     [super drawRect:rect];
     
     CGMutablePathRef path = CGPathCreateMutable();
-    CGPathMoveToPoint(path,NULL,0.0,0.0);
+    CGPathMoveToPoint(path,NULL,self.cornerRadius,0.0);
     
     CGRect intentedSourceRect = [self.superview convertRect:self.sourceRect toView:self];
     
-    if (self.expandsToTop)
-    {
+    if (self.expandsToTop) {
         CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame), 0.0f);
         CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
         CGPathAddLineToPoint(path, NULL, CGRectGetMidX(intentedSourceRect) + kTriangleDimensions, CGRectGetHeight(self.frame));
@@ -152,17 +153,18 @@ static const CGFloat kBoundingOffset = 10.0f;
         CGPathAddLineToPoint(path, NULL, CGRectGetMidX(intentedSourceRect) - kTriangleDimensions, CGRectGetHeight(self.frame));
         CGPathAddLineToPoint(path, NULL, 0.0f, CGRectGetHeight(self.frame));
         CGPathAddLineToPoint(path, NULL, 0.0f, 0.0f);
-    }
-    
-    else
-    {
+    } else {
         CGPathAddLineToPoint(path, NULL, CGRectGetMidX(intentedSourceRect) - kTriangleDimensions, 0.0f);
         CGPathAddLineToPoint(path, NULL, CGRectGetMidX(intentedSourceRect), - kTriangleDimensions);
         CGPathAddLineToPoint(path, NULL, CGRectGetMidX(intentedSourceRect) + kTriangleDimensions, 0.0f);
-        CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame), 0.0f);
-        CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame));
-        CGPathAddLineToPoint(path, NULL, 0.0f, CGRectGetHeight(self.frame));
-        CGPathAddLineToPoint(path, NULL, 0.0f, 0.0f);
+        CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame)-self.cornerRadius, 0.0f);
+        CGPathAddArcToPoint(path, NULL, CGRectGetWidth(self.frame)-self.cornerRadius, 0.0f, CGRectGetWidth(self.frame), self.cornerRadius, self.cornerRadius);
+        CGPathAddLineToPoint(path, NULL, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame)-self.cornerRadius);
+        CGPathAddArcToPoint(path, NULL, CGRectGetWidth(self.frame), CGRectGetHeight(self.frame)-self.cornerRadius, CGRectGetWidth(self.frame)-self.cornerRadius, CGRectGetHeight(self.frame), self.cornerRadius);
+        CGPathAddLineToPoint(path, NULL, self.cornerRadius, CGRectGetHeight(self.frame));
+        CGPathAddArcToPoint(path, NULL, self.cornerRadius, CGRectGetHeight(self.frame), 0, CGRectGetHeight(self.frame)-self.cornerRadius, self.cornerRadius);
+        CGPathAddLineToPoint(path, NULL, 0.0f, self.cornerRadius);
+        CGPathAddArcToPoint(path, NULL, 0.0f, self.cornerRadius, self.cornerRadius, 0.0, self.cornerRadius);
     }
     
     CAShapeLayer *shapeLayer = [CAShapeLayer layer];
@@ -185,13 +187,20 @@ static const CGFloat kBoundingOffset = 10.0f;
 
 #pragma mark - Public Methods
 
-- (void)show
-{
-    [self.parentWindow addSubview:self];
+- (void)showAnimated:(BOOL)animated {
+    if (animated) {
+        self.alpha = 0;
+        [self.parentWindow addSubview:self];
+        [UIView animateWithDuration:0.3 animations:^{
+            self.alpha = 1;
+        }];
+    } else {
+        [self.parentWindow addSubview:self];
+    }
+
 }
 
-- (void)dismiss
-{
+- (void)dismiss {
     [self.drapeButton removeFromSuperview];
     [self removeFromSuperview];
 }

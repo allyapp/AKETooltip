@@ -19,10 +19,11 @@
 @property (assign, nonatomic, getter=isShadowHidden) BOOL hideShadow;
 @property (strong, nonatomic) UIColor *arrowColor;
 @property (strong, nonatomic) UIColor *borderColor;
+@property (assign, nonatomic) CGFloat cornerRadius;
 
 - (id)initWithContentView:(UIView *)contentView sourceRect:(CGRect)sourceRect parentWindow:(UIWindow *)parentWindow;
 
-- (void)show;
+- (void)showAnimated:(BOOL)animated;
 - (void)dismiss;
 
 @end
