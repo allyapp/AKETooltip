@@ -187,7 +187,7 @@ static const CGFloat kBoundingOffset = 10.0f;
 
 #pragma mark - Public Methods
 
-- (void)showAnimated:(BOOL)animated {
+- (void)showAnimated:(BOOL)animated withCompletion:(void (^)(void))completion {
     if (animated) {
         self.alpha = 0;
         [self.parentWindow addSubview:self];
@@ -198,11 +198,16 @@ static const CGFloat kBoundingOffset = 10.0f;
         [self.parentWindow addSubview:self];
     }
 
+    self.dismissCompletion = completion;
+
 }
 
 - (void)dismiss {
     [self.drapeButton removeFromSuperview];
     [self removeFromSuperview];
+    if (self.dismissCompletion) {
+        self.dismissCompletion();
+    }
 }
 
 @end

@@ -20,10 +20,11 @@
 @property (strong, nonatomic) UIColor *arrowColor;
 @property (strong, nonatomic) UIColor *borderColor;
 @property (assign, nonatomic) CGFloat cornerRadius;
+@property (nonatomic, copy) void(^dismissCompletion)(void);
 
 - (id)initWithContentView:(UIView *)contentView sourceRect:(CGRect)sourceRect parentWindow:(UIWindow *)parentWindow;
 
-- (void)showAnimated:(BOOL)animated;
+- (void)showAnimated:(BOOL)animated withCompletion:(void (^)(void))completion;
 - (void)dismiss;
 
 @end
