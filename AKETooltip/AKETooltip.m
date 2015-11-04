@@ -199,15 +199,14 @@ static const CGFloat kBoundingOffset = 10.0f;
     }
 
     self.dismissCompletion = completion;
-
 }
 
 - (void)dismiss {
-    [self.drapeButton removeFromSuperview];
-    [self removeFromSuperview];
     if (self.dismissCompletion) {
         self.dismissCompletion();
     }
+    [self.drapeButton removeFromSuperview];
+    [self removeFromSuperview];
 }
 
 @end
